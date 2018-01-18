@@ -1,5 +1,6 @@
 *.data-00000-of-00001
 *.data
+*.index
 *.meta
 *.hdf5
 *.data
