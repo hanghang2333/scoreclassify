@@ -39,7 +39,7 @@ class Data():
         charX = np.array(charX)
         charY = [int(i) for i in self.Y]
         charY = np.array(charY)
-        charY = np.reshape(charY,(-1,1))
+        charY = np.reshape(charY,(-1,))
         return charVocab,id2char,char2id,charX,charY
     
     def getstopword(self):
@@ -84,7 +84,7 @@ class Data():
         wordX.astype(np.int32)
         wordY = [int(i) for i in self.Y]
         wordY = np.array(wordY)
-        wordY = np.reshape(wordY,(-1,1))
+        wordY = np.reshape(wordY,(-1,))
         return wordVocab,id2word,word2id,wordX,wordY
 
     def savechar(self,padlen):
@@ -118,8 +118,8 @@ class Data():
         self.saveword(padlen=padlen)
         print('save word done....')
 
-#data = Data('test.txt')
-#data.save()
+data = Data('test.txt')
+data.save()
 
 #test:
 '''

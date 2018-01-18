@@ -4,8 +4,8 @@ import tensorflow as tf
 import numpy as np
 import copy
 class TextRCNN:
-    def __init__(self,num_classes, learning_rate, decay_steps, decay_rate,sequence_length,
-                 vocab_size,embed_size,is_training,batch_size,initializer=tf.random_normal_initializer(stddev=0.1),multi_label_flag=False):
+    def __init__(self,num_classes, learning_rate, batch_size,decay_steps, decay_rate,sequence_length,
+                 vocab_size,embed_size,is_training,initializer=tf.random_normal_initializer(stddev=0.1)):
         """init all hyperparameter here"""
         # set hyperparamter
         self.num_classes = num_classes
@@ -18,7 +18,6 @@ class TextRCNN:
         self.learning_rate=learning_rate
         self.initializer=initializer
         self.activation=tf.nn.relu #TODO tf.nn.tanh
-        self.multi_label_flag=multi_label_flag
 
         # add placeholder (X,label)
         self.input_x = tf.placeholder(tf.int32, [None, self.sequence_length], name="input_x")  # X
@@ -35,19 +34,11 @@ class TextRCNN:
         self.logits = self.inference() #[None, self.label_size]. main computation graph is here.
         if not is_training:
             return
-        if multi_label_flag:
-            print("going to use multi label loss.")
-            self.loss_val = self.loss_multilabel()
-        else:
-            print("going to use single label loss.")
-            self.loss_val = self.loss()
+        self.loss_val = self.loss()
         self.train_op = self.train()
         self.predictions = tf.argmax(self.logits, axis=1, name="predictions")  # shape:[None,]
-        if not self.multi_label_flag:
-            correct_prediction = tf.equal(tf.cast(self.predictions,tf.int32), self.input_y) #tf.argmax(self.logits, 1)-->[batch_size]
-            self.accuracy =tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name="Accuracy") # shape=()
-        else:
-            self.accuracy = tf.constant(0.5) #fake accuracy. (you can calcuate accuracy outside of graph using method calculate_accuracy(...) in train.py)
+        correct_prediction = tf.equal(tf.cast(self.predictions,tf.int32), self.input_y) #tf.argmax(self.logits, 1)-->[batch_size]
+        self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name="Accuracy") # shape=()
 
     def instantiate_weights(self):
         """define all weights here"""
