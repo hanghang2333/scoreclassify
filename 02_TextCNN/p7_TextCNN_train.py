@@ -15,7 +15,7 @@ tf.app.flags.DEFINE_integer("num_classes",5,"number of label")
 tf.app.flags.DEFINE_float("learning_rate",0.01,"learning rate")
 tf.app.flags.DEFINE_integer("batch_size", 200, "Batch size for training/evaluating.") #批处理的大小 32-->128
 tf.app.flags.DEFINE_integer("decay_steps", 1, "how many steps before decay learning rate.") #6000批处理的大小 32-->128
-tf.app.flags.DEFINE_float("decay_rate", 0.5, "Rate of decay for learning rate.") #0.65一次衰减多少
+tf.app.flags.DEFINE_float("decay_rate", 1, "Rate of decay for learning rate.") #0.65一次衰减多少
 #tf.app.flags.DEFINE_integer("num_sampled",50,"number of noise sampling") #100
 tf.app.flags.DEFINE_string("ckpt_dir","checkpoint/","checkpoint location for the model")
 tf.app.flags.DEFINE_integer("embed_size",100,"embedding size")
