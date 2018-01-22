@@ -13,7 +13,7 @@ import pickle
 FLAGS=tf.app.flags.FLAGS
 tf.app.flags.DEFINE_integer("num_classes",5,"number of label")
 tf.app.flags.DEFINE_float("learning_rate",0.01,"learning rate")
-tf.app.flags.DEFINE_integer("batch_size", 1, "Batch size for training/evaluating.") #批处理的大小 32-->128
+tf.app.flags.DEFINE_integer("batch_size", 200, "Batch size for training/evaluating.") #批处理的大小 32-->128
 tf.app.flags.DEFINE_integer("decay_steps", 6000, "how many steps before decay learning rate.") #6000批处理的大小 32-->128
 tf.app.flags.DEFINE_float("decay_rate", 0.8, "Rate of decay for learning rate.") #0.65一次衰减多少
 #tf.app.flags.DEFINE_integer("num_sampled",50,"number of noise sampling") #100
@@ -29,11 +29,13 @@ filter_sizes=[1,2,3,4,5,6,7] #[1,2,3,4,5,6,7]
 #1.load data(X:list of lint,y:int). 2.create session. 3.feed data. 4.training (5.validation) ,(6.prediction)
 def main(_):
     if 1==1:
-        f = h5py.File('../datautils/wordData50.hdf5','r')
+        f = h5py.File('../datautils/charData50.hdf5','r')
         X,Y = f['X'].value,f['Y'].value
-        d = shelve.open('../datautils/wordData50.data')
+        Y = Y-1
+        d = shelve.open('../datautils/charData50.data')
         Vocab,vocabulary_index2word,vocabulary_word2index= d['Vocab'],d['id2c'],d['c2id']
-        trainX, trainY, testX, testY = X[0:3], Y[0:3], X[3:], Y[3:]
+        lentrain = int(len(X)*0.9)
+        trainX, trainY, testX, testY = X[0:lentrain], Y[0:lentrain], X[lentrain:], Y[lentrain:]
         vocab_size = len(vocabulary_word2index)+1
         print("cnn_model.vocab_size:",vocab_size)
 
@@ -72,7 +74,7 @@ def main(_):
                 feed_dict[textRNN.input_y] = trainY[start:end]
                 curr_loss,curr_acc,_=sess.run([textRNN.loss_val,textRNN.accuracy,textRNN.train_op],feed_dict) #curr_acc--->TextCNN.accuracy
                 loss,counter,acc=loss+curr_loss,counter+1,acc+curr_acc
-                if counter %2==0:
+                if counter %50==0:
                     print("Epoch %d\tBatch %d\tTrain Loss:%.3f\tTrain Accuracy:%.3f" %(epoch,counter,loss/float(counter),acc/float(counter))) #tTrain Accuracy:%.3f---》acc/float(counter)
 
             #epoch increment

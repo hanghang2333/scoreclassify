@@ -4,11 +4,17 @@ import jieba
 import h5py,shelve
 class Data():
     def __init__(self,datafilepath):
-        file = codecs.open(datafilepath,'r').readlines()
-        file = [i.split(',') for i in file]
-        self.id = [i[0] for i in file]
-        self.X = [i[1] for i in file]
-        self.Y = [i[2].replace('\n','') for i in file]
+        file = codecs.open(datafilepath,'r').readlines()[1:]
+        files = [i.split(',') for i in file]
+        self.id,self.X,self.Y = [],[],[]
+        for idx,i in enumerate(file):
+            self.id.append(files[idx])
+            idlen = len(files[idx])
+            self.X.append(i[idlen+1:-3])
+            self.Y.append(i[-2:-1])
+        #self.id = [i[0] for i in files]   
+        #self.X = [i[1] for i in file]
+        #self.Y = [i[2].replace('\n','') for i in file]
     
     def chardata(self,padlen=50):
         #count char number
@@ -89,6 +95,7 @@ class Data():
 
     def savechar(self,padlen):
         charVocab,id2char,char2id,charX,charY = self.chardata()
+        print('charVocab:',len(charVocab),'sampleX:',len(charX))
         #print(charVocab,id2char,char2id,charY,charX)
         f = h5py.File("charData"+str(padlen)+".hdf5","w")
         f.create_dataset('X',data=charX)
@@ -101,6 +108,7 @@ class Data():
         f.close()
     def saveword(self,padlen):
         wordVocab,id2word,word2id,wordX,wordY = self.worddata()
+        print('wordVocab:',len(wordVocab),'sampleX:',len(wordX))
         #print(wordVocab,id2word,word2id,wordY,wordX)
         f = h5py.File("wordData"+str(padlen)+".hdf5","w")
         f.create_dataset('X',data=wordX)
@@ -118,7 +126,7 @@ class Data():
         self.saveword(padlen=padlen)
         print('save word done....')
 
-data = Data('test.txt')
+data = Data('YNU/train_first.csv')
 data.save()
 
 #test:
